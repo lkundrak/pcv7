@@ -11,8 +11,8 @@ START = main.o
 all: stage2
 
 stage2.o: stage2.c
-stage2: stage2.o
-	$(LD) $(LDFLAGS) -s -o $@ $<
+stage2: stage2.o prf.o lo.o
+	$(LD) $(LDFLAGS) -s -o $@ $^
 	
 clean:
 	rm -f stage2 *.o
