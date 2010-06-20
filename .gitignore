@@ -2,3 +2,5 @@
 .gdb_history
 *.o
 image
+mkfs/mkfs
+stage1/boot
