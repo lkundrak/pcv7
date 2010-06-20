@@ -89,6 +89,14 @@ dirfound:
 	mov ax,[si]	; Inode number
 	call readfile
 
+; Exec
+	mov ax,#0x00a1
+	mov ds,ax
+	mov es,ax
+	mov fs,ax
+	mov gs,ax
+	jmp 0x00a1:0x0000
+
 catfile:
 	mov cx,bx
 print:
