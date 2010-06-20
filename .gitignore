@@ -1,0 +1,4 @@
+.*.sw?
+.gdb_history
+*.o
+image
