@@ -1,7 +1,9 @@
 BCOUNT=720
+STAGE2 = stage2
+
 QEMUFLAGS = -monitor stdio
 #QEMUFLAGS = -curses -monitor /dev/tty3
-SUBDIRS=mkfs v7cat stage1 stage2
+SUBDIRS = mkfs v7cat stage1 stage2 boot
 
 all: iboot2
 
@@ -22,11 +24,11 @@ iboot1: image stage1
 	dd if=stage1/boot of=image bs=512 conv=nocreat,notrunc
 
 # Install secondary boot loader
-iboot2: fs stage2
+iboot2: fs $(STAGE2)
 	-mkdir mnt
 	-su -c 'umount mnt'
 	su -c 'mount -o loop -t v7 image mnt'
-	su -c 'cp stage2/stage2 mnt/boot'
+	su -c 'cp $(STAGE2)/boot mnt/boot'
 	su -c 'umount mnt'
 
 # Once the image is bootable, we can run it
