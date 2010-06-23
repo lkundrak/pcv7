@@ -461,9 +461,7 @@ _stop(s)
 char	*s;
 {
 	printf("%s\n", s);
-#ifdef PDP11
 	_rtt();
-#endif
 }
 
 trap(ps)

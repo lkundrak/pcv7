@@ -61,3 +61,10 @@ __bdread:
 	mov ax,#1
 	pop bp
 	ret
+
+; Utility
+
+.GLOBAL __rtt
+__rtt:
+	hlt
+	jmp __rtt
