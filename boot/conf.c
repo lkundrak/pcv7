@@ -33,12 +33,16 @@ nullsys()
 /*
 int rpstrategy();
 int rkstrategy();
+*/
+int bdstrategy();
 int	nullsys();
+/*
 int	tmstrategy(), tmrew(), tmopen();
 int	htstrategy(), htopen(),htclose();
 int	hpstrategy();
 */
 struct devsw devsw[] {
+	"bd",	bdstrategy,	nullsys,	nullsys,
 /*
 	"rp",	rpstrategy,	nullsys,	nullsys,
 	"hp",	hpstrategy,	nullsys,	nullsys,
