@@ -4,5 +4,5 @@
 image
 mkfs/mkfs
 stage1/boot
-stage2/boot
+stage3/boot
 boot/boot
