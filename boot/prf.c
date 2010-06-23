@@ -59,6 +59,7 @@ long n;
 
 
 
+#ifdef PDP11
 struct	device	{
 	int	rcsr,rbuf;
 	int	tcsr,tbuf;
@@ -109,6 +110,7 @@ getchar()
 	putchar(c);
 	return(c);
 }
+#endif
 
 gets(buf)
 char	*buf;
