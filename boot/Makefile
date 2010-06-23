@@ -9,7 +9,7 @@ START = main.o
 
 all: boot
 
-boot: boot.o prf.o SYS.o conf.o bcc_long.o l3.o atol.o lo.o bd.o
+boot: boot.o prf.o SYS.o conf.o bcc.o l3.o atol.o lo.o bd.o
 	$(LD) $(LDFLAGS) -s -o $@ $^
 
 dump: clean boot

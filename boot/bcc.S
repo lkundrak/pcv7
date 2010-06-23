@@ -519,3 +519,97 @@ negq:
 	pop	si
 	pop	bp
 	ret
+
+/* Function idiv */
+! idiv.s
+! idiv_ doesn`t preserve dx (returns remainder in it)
+
+.GLOBAL idiv_
+
+idiv_:
+	cwd
+	idiv	bx
+	ret
+
+/* Function idivu */
+! idivu.s
+! idiv_u doesn`t preserve dx (returns remainder in it)
+
+.GLOBAL idiv_u
+
+idiv_u:
+	xor	dx,dx
+	div	bx
+	ret
+
+/* Function imod */
+! imod.s
+! imod doesn`t preserve dx (returns quotient in it)
+
+.GLOBAL imod
+
+imod:
+	cwd
+	idiv	bx
+	mov	ax,dx	
+	ret
+
+/* Function imodu */
+! imodu.s
+! imodu doesn`t preserve dx (returns quotient in it)
+
+.GLOBAL imodu
+
+imodu:
+	xor	dx,dx
+	div	bx
+	mov	ax,dx		! instruction queue full so xchg slower
+	ret
+
+/* Function imul */
+! imul.s
+! imul_, imul_u don`t preserve dx
+
+.GLOBAL imul_
+.GLOBAL imul_u
+
+imul_:
+imul_u:
+	imul	bx
+	ret
+
+/* Function isl */
+! isl.s
+! isl, islu don`t preserve cl
+
+.GLOBAL isl
+.GLOBAL islu
+
+isl:
+islu:
+	mov	cl,bl
+	shl	ax,cl
+	ret
+
+/* Function isr */
+! isr.s
+! isr doesn`t preserve cl
+
+.GLOBAL isr
+
+isr:
+	mov	cl,bl
+	sar	ax,cl
+	ret
+
+/* Function isru */
+! isru.s
+! isru doesn`t preserve cl
+
+.GLOBAL isru
+
+isru:
+	mov	cl,bl
+	shr	ax,cl
+	ret
+
