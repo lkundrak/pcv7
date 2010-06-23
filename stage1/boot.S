@@ -12,13 +12,17 @@
 
 ; Memory:
 ;     - Interrupt vectors
-; 00600 inode
+; 00600 inode (second stage loads kernel here)
 ; 00800 (Single) indirect block
 ; 00a00 file data blocks
 ; 07c00 This boot sector code
 ; 0ffff Top of our stack
+; 10600 We'l relocate the second stage bootstrap here
+; 205ff Top of second stage stack
 ; a0000 End of usable RAM
 ;     - Video RAM and BIOS
+
+STAGE2=0x1060
 
 .GLOBAL _main
 _main:
@@ -89,27 +93,31 @@ dirfound:
 	mov ax,[si]	; Inode number
 	call readfile
 
-; Exec
+; Relocate it
+	mov cx,bx	; This many bytes
+	sub cx,#0x10	; Sans the header
+	mov si,#0x0a10	; From here
+	mov di,#0x0
+	mov ax,#STAGE2	; To here
+	mov es,ax
+copyboot:
+	lodsb
+	stosb
+	loop copyboot
+
+; Entry point
+	mov bx,0x0a0a
+; Pass control to the newly loaded loaded kernel
 	mov ax,#0x00a1
 	mov ds,ax
-	mov es,ax
+	mov ax,#STAGE2
+	mov ds,ax
 	mov fs,ax
 	mov gs,ax
-	jmp 0x00a1:0x0000
-
-catfile:
-	mov cx,bx
-print:
-	mov ah,#0x0e	; Output character
-	mov dx,#0x0a00
-	add dx,bx
-	sub dx,cx
-	mov si,dx
-	mov al,[si]
-	int #0x10
-	loop print
-
-	jmp lp
+	mov ss,ax
+	push ax
+	push bx
+	retf
 
 ; Error
 error:
@@ -121,6 +129,7 @@ error:
 lp:
 	hlt
 	jmp lp
+
 
 ; Given inode number, read the contents
 ; of the file
