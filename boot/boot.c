@@ -6,7 +6,11 @@
 #include <saio.h>
 
 
+#if 0
 char line[100];
+#else
+char line[] = "bd(0,0)unix";
+#endif
 
 main()
 {
@@ -15,6 +19,7 @@ int i;
 
 
 	printf("Boot\n");
+#if 0
 	do {
 		printf(": "); gets(line);
 		i = open(line,0);
@@ -23,8 +28,11 @@ int i;
 
 	copyunix(i);
 
+#else
 	i = open(line,0);
 	copyunix(i);
+	jumpunix ();
+#endif
 	jumpunix ();
 }
 
