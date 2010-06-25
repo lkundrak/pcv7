@@ -4,7 +4,7 @@ STAGE3 = stage3
 
 QEMUFLAGS = -monitor stdio
 #QEMUFLAGS = -curses -monitor /dev/tty3
-SUBDIRS = mkfs v7cat stage1 boot stage2b stage3
+SUBDIRS = mkfs v7cat stage1 boot stage2b stage3 unix
 
 all: iboot2
 
@@ -30,7 +30,7 @@ iboot2: fs $(STAGE2) $(STAGE3)
 	-su -c 'umount mnt'
 	su -c 'mount -o loop -t v7 image mnt'
 	su -c 'cp $(STAGE2)/boot mnt/boot'
-	su -c 'cp $(STAGE3)/boot mnt/unix'
+	su -c 'cp $(STAGE3)/unix mnt/unix'
 	su -c 'umount mnt'
 
 # Once the image is bootable, we can run it

@@ -7,10 +7,10 @@ AS = as86
 ASFLAGS = -0 -g
 START = main.o
 
-all: boot
+all: unix
 
-boot: stage2.o prf.o lo.o
+unix: stage2.o prf.o lo.o
 	$(LD) $(LDFLAGS) -s -o $@ $^
 	
 clean:
-	rm -f boot *.o pure
+	rm -f unix *.o pure
