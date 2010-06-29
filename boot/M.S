@@ -10,8 +10,12 @@ _mtpi:
 	mov ax,0x4[bp]
 	mov di,0x6[bp]
 	push es
-	push #KERNEL
+
+	mov bx,curseg
+	add bx,#KERNEL
+	push bx
 	pop es
+
 	stosw
 	pop es
 	pop di
@@ -27,8 +31,12 @@ _clrseg:
 	mov di,0x4[bp]	; From here
 	mov cx,0x6[bp]	; This many bytes
 	push es
-	push #KERNEL
+
+	mov bx,curseg
+	add bx,#KERNEL
+	push bx
 	pop es
+
 	xor al,al	; Zero out
 	rep
 		stosb
@@ -42,31 +50,30 @@ _clrseg:
 _setseg:
 	push bp
 	mov bp,sp
-	cmp 0x4[bp],#0
-	je goodseg
-	push #badseg
-	call __stop
-goodseg:
+	mov ax,0x4[bp]
+	mov curseg,ax
 	pop bp
 	ret
 
 ; Start executing the kernel
 .GLOBAL _jumpunix
 _jumpunix:
+	; Data segment
 	mov ax,#KERNEL
+	; Text segment
+	mov bx,curseg
+	add bx,#KERNEL
+	; Set the segmentation registers appropriately
         mov es,ax
         mov ds,ax
         mov fs,ax
         mov gs,ax
         mov ss,ax
-	mov di,#0
-	mov ax,[di]
 	mov sp,#0xffff
-	push #KERNEL
+	push bx
 	push #0x0	; Entry point hardcoded for now
 	retf
 
-.DATA
-badseg:
-	.ASCII "Separate I&D not supported"
+.GLOBAL curseg
+curseg:
 	.WORD 0x0

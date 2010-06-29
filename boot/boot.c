@@ -55,7 +55,6 @@ int	magic;
 
 	switch (magic) {
 	case 0411:
-		_stop ("Separate I&D for kernel not supported yet");
 		setseg(0);
 		lseek(io, (long)(020+txtsiz), 0);
 
