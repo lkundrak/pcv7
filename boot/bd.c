@@ -26,6 +26,10 @@ register struct iob *io;
 {
 	struct chs xchs, chs;
 
+	if (func != READ) {
+		_stop ("Only READ operation supported");
+	}
+
 	/* Autodetect drive geometry type */
 	if (!type) {
 		int i = 0;
@@ -43,7 +47,7 @@ register struct iob *io;
 	chs.head = chs.sec/type->sec;
 	chs.sec = chs.sec%type->sec+1;
 
-	if (bdread (io->i_unit, chs.cyl, chs.sec, chs.head, io->i_buf)) {
+	if (bdread (io->i_unit, chs.cyl, chs.sec, chs.head, io->i_ma)) {
 		_stop ("Read error.");
 	}
 
