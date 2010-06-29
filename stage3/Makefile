@@ -2,7 +2,7 @@
 CC = bcc
 CFLAGS = -0 -Md -Ms -I -I.
 LD = ld86
-LDFLAGS = -0 -7 -M -t -m
+LDFLAGS = -0 -7 -M -t -m -i
 AS = as86
 ASFLAGS = -0 -g
 START = main.o
