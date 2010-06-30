@@ -2,7 +2,8 @@
 CC = bcc
 CFLAGS = -0 -Md -Ms -I -I.
 LD = ld86
-LDFLAGS = -0 -s -i -7 /usr/lib/bcc/libbcc.a #-M -t -m
+LDFLAGS = -0 -s -i -7 #-M -t -m
+LIBBCC = /usr/lib/bcc/libbcc.a
 AS = as86
 ASFLAGS = -0 -g
 START = main.o
@@ -27,7 +28,7 @@ libc.a: /usr/lib/bcc/libc.a
 	cp $< $@
 
 unix: $(FILES)
-	$(LD) $(LDFLAGS) -s -o $@ $^
+	$(LD) $(LDFLAGS) -s -o $@ $^ $(LIBBCC)
 
 dump: clean unix
 	dd if=unix bs=16 skip=1 of=pure
