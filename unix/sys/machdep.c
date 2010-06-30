@@ -38,6 +38,7 @@ startup()
 {
 	register i;
 
+#if 0
 	/*
 	 * zero and free all of core
 	 */
@@ -70,6 +71,7 @@ startup()
 
 	UISA->r[7] = ka6->r[1]; /* io segment */
 	UISD->r[7] = 077406;
+#endif
 }
 
 /*
