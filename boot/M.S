@@ -51,6 +51,10 @@ _setseg:
 	push bp
 	mov bp,sp
 	mov ax,0x4[bp]
+	; Value is given in 64B,
+	; not 16B clicks
+	; XXXXXX verify!
+	shl ax,#3
 	mov curseg,ax
 	pop bp
 	ret
