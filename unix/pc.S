@@ -43,12 +43,6 @@ _waitloc:
 .GLOBL _addupc
 _addupc:
 
-.GLOBL _idle
-_idle:
-
-.GLOBL _putchar
-_putchar:
-
 .GLOBL _copyout
 _copyout:
 
@@ -94,4 +88,39 @@ _restfp:
 .GLOBL _stst
 _stst:
 
+	ret
+
+.GLOBAL _putchar
+_putchar:
+	push bp
+	mov bp,sp
+
+	; CRLF conversion
+	cmp 4[bp],#0xa
+	jne __putchar
+	push #0xd
+	call _putchar
+	add sp,#2
+__putchar:
+
+	; BIOS Teletype output
+	mov al,4[bp]
+	mov ah,#0x0e	; Output character
+	int #0x10
+	cmp al,#0xa
+	pop bp
+	ret
+
+.GLOBL _idle
+_idle:
+	hlt
+	ret
+
+
+; Supplementary
+.GLOBAL _memsize
+_memsize:
+	int #0x12
+	; Kbytes to 64B clicks
+	shl ax,#4
 	ret
