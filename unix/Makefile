@@ -6,11 +6,11 @@ LDFLAGS = -0 -s -i -7 #-M -t -m
 LIBBCC = /usr/lib/bcc/libbcc.a
 AS = as86
 ASFLAGS = -0 -g
-START = main.o
 
-FILES = conf/c.o pc.o
+FILES = sys/main.o
+FILES += conf/c.o pc.o
 FILES += sys/malloc.o sys/prim.o sys/pipe.o sys/acct.o sys/sys1.o 
-FILES += sys/clock.o sys/prf.o sys/ureg.o sys/main.o sys/text.o sys/nami.o 
+FILES += sys/clock.o sys/prf.o sys/ureg.o sys/text.o sys/nami.o 
 FILES += sys/subr.o sys/slp.o sys/sysent.o sys/machdep.o sys/rdwri.o 
 FILES += sys/sig.o sys/sys3.o sys/fio.o sys/iget.o sys/fakemx.o sys/sys2.o 
 FILES += sys/sys4.o sys/trap.o sys/alloc.o
