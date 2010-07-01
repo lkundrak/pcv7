@@ -1,3 +1,5 @@
+.TEXT
+
 .GLOBL _spl6
 _spl6:
 
@@ -21,9 +23,6 @@ _fubyte:
 
 .GLOBL _subyte
 _subyte:
-
-.GLOBL _clearseg
-_clearseg:
 
 .GLOBL _spl1
 _spl1:
@@ -88,6 +87,8 @@ _restfp:
 .GLOBL _stst
 _stst:
 
+	push #eimpl
+	call _panic
 	ret
 
 .GLOBAL _putchar
@@ -116,11 +117,47 @@ _idle:
 	hlt
 	ret
 
+; Clear a single 64B click
+.GLOBL _clearseg
+_clearseg:
+	push bp
+	mov bp,sp
+	mov ax,0x4[bp]
+	shl ax,#2	; Convert to a segment
+	push es
+	push ax
+	pop es
+	xor al,al	; Zero out
+	mov cx,#64	; 64 bytes
+	rep
+		stosb
+	pop es
+	pop bp
+	ret
+
 
 ; Supplementary
+
+; maxmem
 .GLOBAL _memsize
 _memsize:
 	int #0x12
 	; Kbytes to 64B clicks
 	shl ax,#4
 	ret
+
+; First 64B click not occupied by kernel
+.GLOBAL _usermem
+_usermem:
+	mov ax,cs
+	add ax,#0x1000
+	add ax,#0x3
+	shr ax,#2
+	ret
+
+.DATA
+
+; Not used by PC
+.GLOBAL _cputype
+_cputype:
+	.WORD 0x0

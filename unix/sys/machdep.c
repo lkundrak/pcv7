@@ -38,48 +38,26 @@ startup()
 {
 	register i;
 
-#if 0
+	maxmem = memsize ();
+	i = usermem ();
+
 	/*
 	 * zero and free all of core
 	 */
 
-	i = ka6->r[0] + USIZE;
-	UISD->r[0] = 077406;
 	for(;;) {
-		UISA->r[0] = i;
-		if(fuibyte((caddr_t)0) < 0)
+		if(i == maxmem)
 			break;
 		clearseg(i);
-		maxmem++;
-		mfree(coremap, 1, i);
+		mfree (coremap, 1, i);
 		i++;
 	}
-	if(cputype == 70)
-	for(i=0; i<62; i+=2) {
-		UBMAP->r[i] = i<<12;
-		UBMAP->r[i+1] = 0;
-	}
+
 	printf("mem = %D\n", ctob((long)maxmem));
-	printf("mem = %D\n", ctob((long)maxmem));
-memsize ();
-#else
-	maxmem = memsize ();
-	printf("mem = %D\n", ctob((long)maxmem));
-#endif
-#if 0
-	printf("mem = %D\n", 0x1234, 0x5678, 0x9abc, 0xdef0);
 	if(MAXMEM < maxmem)
 		maxmem = MAXMEM;
 	mfree(swapmap, nswap, 1);
 	swplo--;
-
-	/*
-	 * determine clock
-	 */
-
-	UISA->r[7] = ka6->r[1]; /* io segment */
-	UISD->r[7] = 077406;
-#endif
 }
 
 /*
