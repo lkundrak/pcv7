@@ -33,7 +33,11 @@ unix: $(FILES)
 dump: clean unix
 	dd if=unix bs=16 skip=1 of=pure
 	objdump -m i8086 -b binary -M i8086 -D pure
-	
+
+meta:
+	find -name '*.[chly]' |tee cscope.files |xargs ctags
+
+
 clean:
 	rm -f unix pure $(FILES)
 

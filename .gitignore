@@ -7,3 +7,7 @@ stage1/boot
 stage3/boot
 boot/boot
 unix/unix
+unix/Makefile.bak
+unix/cscope.files
+unix/tags
+unix/unix.dbg
