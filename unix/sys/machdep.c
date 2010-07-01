@@ -66,6 +66,8 @@ startup()
  */
 sysphys()
 {
+panic("no sysphys()");
+#ifdef PDP11
 	register i, s, d;
 	register struct a {
 		int	segno;
@@ -104,6 +106,7 @@ sysphys()
 
 bad:
 	u.u_error = EINVAL;
+#endif
 }
 
 /*
@@ -153,6 +156,8 @@ int	maplock;
 mapalloc(bp)
 register struct buf *bp;
 {
+panic("no mapalloc()");
+#ifdef PDP11
 	register i, a;
 
 	if(cputype != 70)
@@ -171,6 +176,7 @@ register struct buf *bp;
 	for(a++; i<48; i+=2)
 		UBMAP->r[i+1] = a;
 	bp->b_xmem = 1;
+#endif
 }
 
 mapfree(bp)

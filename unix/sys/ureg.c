@@ -14,6 +14,8 @@
  */
 sureg()
 {
+panic ("no sureg()");
+#ifdef PDP11
 	register *udp, *uap, *rdp;
 	int *rap, *limudp;
 	int taddr, daddr;
@@ -32,6 +34,7 @@ sureg()
 		*rap++ = *uap++ + (*udp&TX? taddr: (*udp&ABS? 0: daddr));
 		*rdp++ = *udp++;
 	}
+#endif
 }
 
 /*
@@ -48,6 +51,8 @@ sureg()
 estabur(nt, nd, ns, sep, xrw)
 unsigned nt, nd, ns;
 {
+panic ("no estabur()");
+#ifdef PDP11
 	register a, *ap, *dp;
 
 	if(sep) {
@@ -136,4 +141,5 @@ unsigned nt, nd, ns;
 err:
 	u.u_error = ENOMEM;
 	return(-1);
+#endif
 }

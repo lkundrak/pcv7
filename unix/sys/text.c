@@ -126,7 +126,9 @@ register struct inode *ip;
 		panic("out of swap space");
 	u.u_procp->p_textp = xp;
 	xexpand(xp);
+#ifdef PDP11
 	estabur(ts, (unsigned)0, (unsigned)0, 0, RW);
+#endif
 	u.u_count = u.u_exdata.ux_tsize;
 	u.u_offset = sizeof(u.u_exdata);
 	u.u_base = 0;

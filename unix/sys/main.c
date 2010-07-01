@@ -35,7 +35,9 @@ main()
 	 * set up system process
 	 */
 
+#ifdef PDP11
 	proc[0].p_addr = ka6->r[0];
+#endif
 	proc[0].p_size = USIZE;
 	proc[0].p_stat = SRUN;
 	proc[0].p_flag |= SLOAD|SSYS;
@@ -66,7 +68,9 @@ main()
 
 	if(newproc()) {
 		expand(USIZE + (int)btoc(szicode));
+#ifdef PDP11
 		estabur((unsigned)0, btoc(szicode), (unsigned)0, 0, RO);
+#endif
 		copyout((caddr_t)icode, (caddr_t)0, szicode);
 		/*
 		 * Return goes to loc. 0 of user init

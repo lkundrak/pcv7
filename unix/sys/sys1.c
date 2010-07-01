@@ -221,8 +221,10 @@ register struct inode *ip;
 		xalloc(ip);
 		u.u_ar0[PC] = u.u_exdata.ux_entloc & ~01;
 	} else {
+#ifdef PDP11
 		if(estabur(ts, ds, ss, sep, RO))
 			goto bad;
+#endif
 	
 		/*
 		 * allocate and clear core
@@ -242,7 +244,9 @@ register struct inode *ip;
 		 * read in data segment
 		 */
 	
+#ifdef PDP11
 		estabur((unsigned)0, ds, (unsigned)0, 0, RO);
+#endif
 		u.u_base = 0;
 		u.u_offset = sizeof(u.u_exdata)+u.u_exdata.ux_tsize;
 		u.u_count = u.u_exdata.ux_dsize;
@@ -265,7 +269,9 @@ register struct inode *ip;
 	u.u_dsize = ds;
 	u.u_ssize = ss;
 	u.u_sep = sep;
+#ifdef PDP11
 	estabur(ts, ds, ss, sep, RO);
+#endif
 bad:
 	return(overlay);
 }
@@ -495,8 +501,10 @@ sbreak()
 		n = 0;
 	d = n - u.u_dsize;
 	n += USIZE+u.u_ssize;
+#ifdef PDP11
 	if(estabur(u.u_tsize, u.u_dsize+d, u.u_ssize, u.u_sep, RO))
 		return;
+#endif
 	u.u_dsize += d;
 	if(d > 0)
 		goto bigger;

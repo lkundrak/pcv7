@@ -525,7 +525,9 @@ int (*strat)();
 	 * Compute physical address by simulating
 	 * the segmentation hardware.
 	 */
+#ifdef PDP11
 	ts = (u.u_sep? UDSA: UISA)->r[nb>>7] + (nb&0177);
+#endif
 	bp->b_un.b_addr = (caddr_t)((ts<<6) + (base&077));
 	bp->b_xmem = (ts>>10) & 077;
 	bp->b_blkno = u.u_offset >> BSHIFT;

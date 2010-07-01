@@ -47,10 +47,12 @@ register int a;
 	register struct map *bp;
 	register unsigned int t;
 
+#if 0
 	if ((bp = mp)==coremap && runin) {
 		runin = 0;
 		wakeup((caddr_t)&runin);	/* Wake scheduler when freeing core */
 	}
+#endif
 	for (; bp->m_addr<=a && bp->m_size!=0; bp++);
 	if (bp>mp && (bp-1)->m_addr+(bp-1)->m_size == a) {
 		(bp-1)->m_size += size;

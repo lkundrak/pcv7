@@ -60,7 +60,9 @@ dev_t dev;
 	 *		address_of_saved_ps - 2;
 	 */
 	default:
+#ifdef PDP11
 		printf("ka6 = %o\n", ka6->r[0]);
+#endif
 		printf("aps = %o\n", &ps);
 		printf("pc = %o ps = %o\n", pc, ps);
 		printf("trap type %o\n", dev);

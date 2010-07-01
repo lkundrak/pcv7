@@ -219,7 +219,9 @@ core()
 		u.u_segflg = 1;
 		writei(ip);
 		s = u.u_procp->p_size - USIZE;
+#ifdef PDP11
 		estabur((unsigned)0, s, (unsigned)0, 0, RO);
+#endif
 		u.u_base = 0;
 		u.u_count = ctob(s);
 		u.u_segflg = 0;
@@ -246,8 +248,10 @@ unsigned sp;
 	si = (-sp)/64 - u.u_ssize + SINCR;
 	if(si <= 0)
 		return(0);
+#ifdef PDP11
 	if(estabur(u.u_tsize, u.u_dsize, u.u_ssize+si, u.u_sep, RO))
 		return(0);
+#endif
 	p = u.u_procp;
 	expand(p->p_size+si);
 	a = p->p_addr + p->p_size;
@@ -356,10 +360,14 @@ procxmt()
 				goto error;
 			xp->x_iptr->i_flag &= ~ITEXT;
 		}
+#ifdef PDP11
 		estabur(u.u_tsize, u.u_dsize, u.u_ssize, u.u_sep, RW);
+#endif
 		i = suiword((caddr_t)ipc.ip_addr, 0);
 		suiword((caddr_t)ipc.ip_addr, ipc.ip_data);
+#ifdef PDP11
 		estabur(u.u_tsize, u.u_dsize, u.u_ssize, u.u_sep, RO);
+#endif
 		if (i<0)
 			goto error;
 		if (xp)

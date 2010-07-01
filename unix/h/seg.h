@@ -1,3 +1,5 @@
+#if PDP11
+
 /*
  * KT-11 addresses and bits.
  */
@@ -21,3 +23,5 @@ physadr	ka6;		/* 11/40 KISA6; 11/45 KDSA6 */
  * address to access 11/70 UNIBUS map
  */
 #define	UBMAP	((physadr)0170200)
+
+#endif

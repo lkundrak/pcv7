@@ -161,3 +161,9 @@ _usermem:
 .GLOBAL _cputype
 _cputype:
 	.WORD 0x0
+
+; Supplementary
+.GLOBAL eimpl
+eimpl:
+	.ASCII "Not implemented"
+	.WORD 0x0
