@@ -37,6 +37,9 @@ dump: clean unix
 clean:
 	rm -f unix pure $(FILES)
 
+depend:
+	find * -name '*.c' -not -name mkconf.c |xargs makedepend -I.
+
 # DO NOT DELETE This line, or makedepend will be very angry
 
 conf/c.o: h/param.h h/systm.h h/buf.h h/tty.h h/conf.h h/proc.h h/text.h
