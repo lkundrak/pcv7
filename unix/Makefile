@@ -28,7 +28,7 @@ libc.a: /usr/lib/bcc/libc.a
 	cp $< $@
 
 unix: $(FILES)
-	$(LD) $(LDFLAGS) -s -o $@ $^ $(LIBBCC)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBBCC)
 
 dump: clean unix
 	dd if=unix bs=16 skip=1 of=pure
