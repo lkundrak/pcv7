@@ -40,10 +40,19 @@ meta:
 
 
 clean:
-	rm -f unix pure $(FILES)
+	rm -f unix pure $(FILES) icode.h icode.o icode
 
 depend:
 	find * -name '*.c' -not -name mkconf.c |xargs makedepend -I.
+
+icode: icode.o
+	$(LD) -o $@ -d $<
+
+icode.h: icode
+	objdump -m i8086 -b binary -M i8086 -M intel -D $< | \
+		perl -ne '/^\s+[0-9a-f]+:\s+(([0-9a-f]{2} )+)\s+(.*)$$/ or next; #\
+		printf "\t%-20s /* %s */\n", #\
+		join ("", map { "0x$$_, " } split " ", $$1), $$3' >$@
 
 # DO NOT DELETE This line, or makedepend will be very angry
 
@@ -71,6 +80,7 @@ dev/cat.o: h/param.h h/dir.h h/user.h h/tty.h
 dev/pk3.o: h/param.h h/systm.h h/conf.h h/buf.h
 dev/mem.o: h/param.h h/dir.h h/user.h h/conf.h h/seg.h
 dev/ht.o: h/param.h h/systm.h h/buf.h h/conf.h h/dir.h h/file.h h/user.h
+dev/bd.o: h/param.h h/systm.h h/buf.h h/conf.h h/dir.h h/user.h
 dev/dn.o: h/param.h h/dir.h h/user.h
 dev/pk2.o: h/pk.p h/param.h h/dir.h h/user.h h/pk.h h/tty.h h/buf.h h/proc.h
 dev/sys.o: h/param.h h/conf.h h/dir.h h/user.h h/tty.h h/proc.h
@@ -102,7 +112,7 @@ sys/text.o: h/inode.h h/buf.h h/seg.h
 sys/acct.o: h/param.h h/systm.h h/acct.h h/dir.h h/user.h h/inode.h h/proc.h
 sys/acct.o: h/seg.h
 sys/machdep.o: h/param.h h/systm.h h/acct.h h/dir.h h/user.h h/inode.h
-sys/machdep.o: h/proc.h h/seg.h h/map.h h/reg.h h/buf.h
+sys/machdep.o: h/proc.h h/seg.h h/map.h h/reg.h h/buf.h icode.h
 sys/slp.o: h/param.h h/systm.h h/dir.h h/user.h h/proc.h h/text.h h/map.h
 sys/slp.o: h/file.h h/inode.h h/buf.h
 sys/sysent.o: h/param.h h/systm.h

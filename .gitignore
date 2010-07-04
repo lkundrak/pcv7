@@ -1,4 +1,5 @@
 .*.sw?
+.sw?
 .gdb_history
 *.o
 image
@@ -11,3 +12,5 @@ unix/Makefile.bak
 unix/cscope.files
 unix/tags
 unix/unix.dbg
+unix/icode
+unix/icode.h

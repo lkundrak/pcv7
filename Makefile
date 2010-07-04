@@ -1,6 +1,6 @@
 BCOUNT=720
 STAGE2 = boot
-STAGE3 = stage3
+STAGE3 = unix
 
 QEMUFLAGS = -monitor stdio
 #QEMUFLAGS = -curses -monitor /dev/tty3

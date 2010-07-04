@@ -17,6 +17,7 @@
  */
 int	icode[] =
 {
+#ifdef PDP11
 	0104413,	/* sys exec; init; initp */
 	0000014,
 	0000010,
@@ -28,6 +29,9 @@ int	icode[] =
 	0064457,
 	0064556,
 	0000164,
+#else
+#include "icode.h"
+#endif
 };
 int	szicode = sizeof(icode);
 
