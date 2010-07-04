@@ -155,6 +155,32 @@ _usermem:
 	shr ax,#2
 	ret
 
+; Disk input
+
+.GLOBAL _bddread
+_bddread:
+	push bp
+	mov bp,sp
+
+	mov ah,#0x02	; Read sectors
+	mov al,#0x01	; One sector
+	mov dl,4[bp]	; Unit number
+	mov ch,6[bp]	; Track
+	mov cl,8[bp]	; Sector
+	mov dh,10[bp]	; Head
+	mov bx,12[bp]	; Destination address
+
+	int #0x13
+
+	jc __bdread	; Short read?
+	xor ax,ax
+	pop bp
+	ret
+__bdread:
+	mov ax,#1
+	pop bp
+	ret
+
 .DATA
 
 ; Not used by PC

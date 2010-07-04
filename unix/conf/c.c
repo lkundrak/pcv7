@@ -19,8 +19,11 @@ struct	buf	rktab;
 int	htopen(), htclose(), htstrategy();
 struct	buf	httab;
 #endif
+int	bdopen(), bdclose(), bdstrategy();
+struct	buf	bdtab;
 struct	bdevsw	bdevsw[] =
 {
+	bdopen, bdclose, bdstrategy, &bdtab, /* bd = 1 */
 #if 0
 	nulldev, nulldev, rkstrategy, &rktab,	/* rk = 0 */
 	nodev, nodev, nodev, 0, /* rp = 1 */

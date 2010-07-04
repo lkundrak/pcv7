@@ -15,6 +15,7 @@ FILES += sys/subr.o sys/slp.o sys/sysent.o sys/machdep.o sys/rdwri.o
 FILES += sys/sig.o sys/sys3.o sys/fio.o sys/iget.o sys/fakemx.o sys/sys2.o 
 FILES += sys/sys4.o sys/trap.o sys/alloc.o
 FILES += dev/bio.o dev/tty.o dev/partab.o
+FILES += dev/bd.o
 #FILES += libc.a
 #dev/dhdm.o dev/du.o dev/kl.o dev/rp.o dev/mem.o dev/rf.o dev/partab.o dev/pk3.o 
 #dev/dkleave.o dev/rl.o dev/sys.o dev/pk2.o dev/dz.o dev/ht.o dev/dsort.o 
