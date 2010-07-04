@@ -185,12 +185,14 @@ register struct buf *bp;
 	register struct buf **backp;
 	register s;
 
+#if 0
 	if (bp->b_flags&B_WANTED)
 		wakeup((caddr_t)bp);
 	if (bfreelist.b_flags&B_WANTED) {
 		bfreelist.b_flags &= ~B_WANTED;
 		wakeup((caddr_t)&bfreelist);
 	}
+#endif
 	if (bp->b_flags&B_ERROR)
 		bp->b_dev = NODEV;  /* no assoc. on error */
 	s = spl6();

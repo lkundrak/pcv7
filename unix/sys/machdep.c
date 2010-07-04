@@ -113,10 +113,13 @@ bad:
  * Determine which clock is attached, and start it.
  * panic: no clock found
  */
+#if 0
 #define	CLOCK1	((physadr)0177546)
 #define	CLOCK2	((physadr)0172540)
+#endif
 clkstart()
 {
+	#if 0
 	lks = CLOCK1;
 	if(fuiword((caddr_t)lks) == -1) {
 		lks = CLOCK2;
@@ -124,6 +127,7 @@ clkstart()
 			panic("no clock");
 	}
 	lks->r[0] = 0115;
+	#endif
 }
 
 /*
