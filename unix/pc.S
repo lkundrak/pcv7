@@ -40,11 +40,6 @@ _copyout:
 	mov ax,#10
 	jmp ni
 
-.GLOBL _save
-_save:
-	mov ax,#11
-	jmp ni
-
 .GLOBL _suibyte
 _suibyte:
 	mov ax,#12
@@ -58,11 +53,6 @@ _fuibyte:
 .GLOBL _savfp
 _savfp:
 	mov ax,#14
-	jmp ni
-
-.GLOBL _resume
-_resume:
-	mov ax,#15
 	jmp ni
 
 .GLOBL _fuiword
@@ -180,6 +170,53 @@ __copy:			; Copy
 	pop es
 	pop bp
 	ret
+
+; Save general purpose registers (context), all of them word-wide:
+; AX, CX, DX, BX, SP, BP, SI and DI (in this "pusha" order)
+; IP is saved in AX, which is the non-zero return value upon resume()
+.GLOBL _save
+_save:
+	cli
+	pop ax		; Return value
+	push bx		; Save BX
+	push di		; Save DI, we use it do index target
+	push bp		; Save BP, used to index argument
+	mov bp,sp
+	mov di,0x6[bp]	; Address to save to
+	mov 0x0[di],ax	; AX, A non-zero return value upon resume()
+	mov 0x2[di],cx
+	mov 0x4[di],dx
+	mov 0x6[di],bx
+	add bp,#0x06	; Original SP (w/o return value)
+	mov 0x8[di],bp
+	pop bp		; Saved BP
+	mov 0xa[di],bp
+	mov 0xc[di],si
+	pop bx		; Saved DI
+	mov 0xe[di],bx
+	mov di,0xe[di]	; Restore DI
+	pop bx		; Restore BX
+	push ax		; Return address
+	xor ax,ax	; Return value in saving process
+	ret
+
+; Restore general purpose registers (context), all of them word-wide:
+; AX, CX, DX, BX, SP, BP, SI and DI (in this "popa" order)
+.GLOBL _resume
+_resume:
+	pop ax		; Throw away return address, we're not returning
+	pop bx		; XXX: U area
+	mov bp,sp
+	mov di,[bp]
+	mov ax,0x0[di]
+	mov cx,0x2[di]
+	mov dx,0x4[di]
+	mov bx,0x6[di]
+	mov sp,0x8[di]
+	mov bp,0xa[di]
+	mov si,0xc[di]
+	mov di,0xe[di]
+	jmp ax
 
 ; No interrupt levels on PC, halt all
 .GLOBL _spl1

@@ -130,7 +130,11 @@ typedef	long		daddr_t;
 typedef char *		caddr_t;
 typedef	unsigned int	ino_t;
 typedef	long		time_t;
+#if PDP11
 typedef	int		label_t[6];	/* regs 2-7 */
+#else
+typedef	int		label_t[8];	/* general purpose regs */
+#endif
 typedef	int		dev_t;
 typedef	long		off_t;
 
