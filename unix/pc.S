@@ -145,11 +145,12 @@ _idle:
 _clearseg:
 	push bp
 	mov bp,sp
-	mov ax,0x4[bp]
+	mov ax,0x4[bp]	; Destination click
 	shl ax,#2	; Convert to a segment
 	push es
 	push ax
 	pop es
+	xor di,di
 	xor al,al	; Zero out
 	mov cx,#64	; 64 bytes
 	rep
