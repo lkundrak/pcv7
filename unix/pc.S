@@ -10,11 +10,6 @@ _suword:
 	mov ax,#3
 	jmp ni
 
-.GLOBL _copyseg
-_copyseg:
-	mov ax,#4
-	jmp ni
-
 .GLOBL _fubyte
 _fubyte:
 	mov ax,#5
@@ -159,6 +154,28 @@ _clearseg:
 	mov cx,#64	; 64 bytes
 	rep
 		stosb
+	pop es
+	pop bp
+	ret
+
+; Copy into a single single 64B click
+; from current data segment
+.GLOBL _copyseg
+_copyseg:
+	push bp
+	mov bp,sp
+	mov si,0x4[bp]	; Source
+	mov ax,0x6[bp]	; Destination
+	shl ax,#2	; Convert to a segment
+	push es
+	push ax
+	pop es
+	xor di,di
+	mov cx,#64	; 64 bytes
+__copy:			; Copy
+	lodsb
+	stosb
+	loop __copy
 	pop es
 	pop bp
 	ret
