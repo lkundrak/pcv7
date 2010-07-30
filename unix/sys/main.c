@@ -38,6 +38,7 @@ main()
 #ifdef PDP11
 	proc[0].p_addr = ka6->r[0];
 #endif
+	proc[0].p_addr = curseg ();
 	proc[0].p_size = USIZE;
 	proc[0].p_stat = SRUN;
 	proc[0].p_flag |= SLOAD|SSYS;

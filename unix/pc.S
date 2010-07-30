@@ -155,19 +155,31 @@ _clearseg:
 _copyseg:
 	push bp
 	mov bp,sp
-	mov si,0x4[bp]	; Source
+	pusha		; Save status (we need ax & cx)
+	push ds
+	push es
+
+	mov ax,0x4[bp]	; Source
+	shl ax,#2	; Convert to a segment
+	push ax
+	pop ds
+
 	mov ax,0x6[bp]	; Destination
 	shl ax,#2	; Convert to a segment
-	push es
 	push ax
 	pop es
-	xor di,di
+
+	xor di,di	; Start at zero
+	xor si,si
 	mov cx,#64	; 64 bytes
 __copy:			; Copy
 	lodsb
 	stosb
 	loop __copy
-	pop es
+
+	pop es		; Resume status
+	pop ds
+	popa
 	pop bp
 	ret
 
@@ -205,7 +217,7 @@ _save:
 .GLOBL _resume
 _resume:
 	pop ax		; Throw away return address, we're not returning
-	pop bx		; XXX: U area
+	pop si		; Process address (clicks)
 	mov bp,sp
 	mov di,[bp]
 	mov ax,0x0[di]
@@ -214,8 +226,17 @@ _resume:
 	mov bx,0x6[di]
 	mov sp,0x8[di]
 	mov bp,0xa[di]
+	push bx		; Save BX on a new stack
+	mov bx,si	; Target segment
+	shl bx,#2	; Convert to a segment
 	mov si,0xc[di]
 	mov di,0xe[di]
+	mov es,bx
+	mov ds,bx
+	mov fs,bx
+	mov gs,bx
+	mov ss,bx
+	pop bx		; Restore original value
 	jmp ax
 
 ; No interrupt levels on PC, halt all
@@ -260,6 +281,13 @@ _usermem:
 	mov ax,cs
 	add ax,#0x1000
 	add ax,#0x3
+	shr ax,#2
+	ret
+
+; Beginning of current D space in clicks
+.GLOBAL _curseg
+_curseg:
+	mov ax,ds
 	shr ax,#2
 	ret
 

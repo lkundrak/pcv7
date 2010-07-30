@@ -501,9 +501,12 @@ retry:
 	 * here's where it will resume.
 	 */
 	if (save(u.u_ssav)) {
+#ifdef PDP11
 		sureg();
+#endif
 		return(1);
 	}
+
 	a2 = malloc(coremap, n);
 	/*
 	 * If there is not enough core for the
@@ -520,6 +523,7 @@ retry:
 		 * There is core, so just copy.
 		 */
 		rpp->p_addr = a2;
+		n = 1024; /* XXX copy all of data segment & stack */
 		while(n--)
 			copyseg(a1++, a2++);
 	}
