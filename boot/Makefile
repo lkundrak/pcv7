@@ -1,6 +1,6 @@
 # Dev86 setup
 CC = bcc
-CFLAGS = -0 -Md -Ms -I -I.
+CFLAGS = -0 -7 -Md -Ms -I -I.
 LD = ld86
 LDFLAGS = -0 -7 /usr/lib/bcc/libbcc.a #-M -t -m
 AS = as86
