@@ -15,9 +15,9 @@
  * program executed in user mode
  * to bring up the system.
  */
+#ifdef PDP11
 int	icode[] =
 {
-#ifdef PDP11
 	0104413,	/* sys exec; init; initp */
 	0000014,
 	0000010,
@@ -30,6 +30,8 @@ int	icode[] =
 	0064556,
 	0000164,
 #else
+char	icode[] =
+{
 #include "icode.h"
 #endif
 };

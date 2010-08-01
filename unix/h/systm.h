@@ -42,7 +42,11 @@ char	msgbuf[MSGBUFS];	/* saved "printf" characters */
 dev_t	rootdev;		/* device of the root */
 dev_t	swapdev;		/* swapping device */
 dev_t	pipedev;		/* pipe device */
+#ifdef PDP11
 extern	int	icode[];	/* user init code */
+#else
+extern	char	icode[];	/* user init code */
+#endif
 extern	int	szicode;	/* its size */
 
 dev_t getmdev();

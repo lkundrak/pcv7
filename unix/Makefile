@@ -7,8 +7,9 @@ LIBBCC = /usr/lib/bcc/libbcc.a
 AS = as86
 ASFLAGS = -0 -g
 
-FILES = sys/main.o
-FILES += conf/c.o pc.o
+FILES = pc.o
+FILES += sys/main.o
+FILES += conf/c.o
 FILES += sys/malloc.o sys/prim.o sys/pipe.o sys/acct.o sys/sys1.o 
 FILES += sys/clock.o sys/prf.o sys/ureg.o sys/text.o sys/nami.o 
 FILES += sys/subr.o sys/slp.o sys/sysent.o sys/machdep.o sys/rdwri.o 

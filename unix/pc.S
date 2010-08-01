@@ -1,5 +1,16 @@
 .TEXT
 
+.GLOBL _start
+_start:
+	; Kernel initialization
+	call _main
+	; Jump into user mode
+	push ds
+	push #0x0
+	retf
+
+; Not implemented
+
 .GLOBL _fuword
 _fuword:
 	mov ax,#2
@@ -33,11 +44,6 @@ _waitloc:
 .GLOBL _addupc
 _addupc:
 	mov ax,#9
-	jmp ni
-
-.GLOBL _copyout
-_copyout:
-	mov ax,#10
 	jmp ni
 
 .GLOBL _suibyte
@@ -238,6 +244,28 @@ _resume:
 	mov ss,bx
 	pop bx		; Restore original value
 	jmp ax
+
+; memcpy
+.GLOBL _copyout
+_copyout:
+	push bp
+	mov bp,sp
+	pusha
+
+	mov si,0x4[bp]	; Source
+	mov di,0x6[bp]	; Destination
+	mov cx,0x8[bp]	; Size
+
+__copyout:		; Copy
+	mov al,[si]
+	mov [di],al
+	inc si
+	inc di
+	loop __copyout
+
+	popa
+	pop bp
+	ret
 
 ; No interrupt levels on PC, halt all
 .GLOBL _spl1

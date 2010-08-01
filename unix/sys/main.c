@@ -68,7 +68,9 @@ main()
 	 */
 
 	if(newproc()) {
+#ifdef PDP11
 		expand(USIZE + (int)btoc(szicode));
+#endif
 #ifdef PDP11
 		estabur((unsigned)0, btoc(szicode), (unsigned)0, 0, RO);
 #endif
