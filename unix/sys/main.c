@@ -74,7 +74,11 @@ main()
 #ifdef PDP11
 		estabur((unsigned)0, btoc(szicode), (unsigned)0, 0, RO);
 #endif
+#ifdef PDP11
 		copyout((caddr_t)icode, (caddr_t)0, szicode);
+#else
+		copyout((caddr_t)icode, (caddr_t)(USIZE * 64), szicode);
+#endif
 		/*
 		 * Return goes to loc. 0 of user init
 		 * code just copied out.

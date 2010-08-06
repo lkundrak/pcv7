@@ -2,6 +2,7 @@ BCOUNT=720
 STAGE2 = boot
 STAGE3 = unix
 
+QEMU = qemu-kvm
 QEMUFLAGS = -monitor stdio
 #QEMUFLAGS = -curses -monitor /dev/tty3
 SUBDIRS = mkfs v7cat stage1 boot stage2b stage3 unix
@@ -35,7 +36,7 @@ iboot2: fs $(STAGE2) $(STAGE3)
 
 # Once the image is bootable, we can run it
 run: iboot1 iboot2
-	qemu -net none -fda image $(QEMUFLAGS)
+	$(QEMU) -net none -fda image $(QEMUFLAGS)
 
 clean:
 	-for S in $(SUBDIRS); do $(MAKE) -C $$S $@; done

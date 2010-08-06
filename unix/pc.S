@@ -2,11 +2,18 @@
 
 .GLOBL _start
 _start:
+	mov sp,#stack
 	; Kernel initialization
 	call _main
 	; Jump into user mode
-	push ds
-	push #0x0
+	mov ax,ss
+	mov es,ax
+	mov ds,ax
+	mov ss,ax
+	mov fs,ax
+	mov gs,ax
+	push ax
+	push #0x0400
 	retf
 
 ; Not implemented
@@ -223,47 +230,43 @@ _save:
 .GLOBL _resume
 _resume:
 	pop ax		; Throw away return address, we're not returning
-	pop si		; Process address (clicks)
+	pop bx		; Process address (clicks)
 	mov bp,sp
 	mov di,[bp]
+	shl bx,#2	; Convert to a segment
+	mov ss,bx	; Switch to a new stack
 	mov ax,0x0[di]
 	mov cx,0x2[di]
 	mov dx,0x4[di]
 	mov bx,0x6[di]
 	mov sp,0x8[di]
 	mov bp,0xa[di]
-	push bx		; Save BX on a new stack
-	mov bx,si	; Target segment
-	shl bx,#2	; Convert to a segment
 	mov si,0xc[di]
 	mov di,0xe[di]
-	mov es,bx
-	mov ds,bx
-	mov fs,bx
-	mov gs,bx
-	mov ss,bx
-	pop bx		; Restore original value
 	jmp ax
 
-; memcpy
+; Copy into current process' .data
 .GLOBL _copyout
 _copyout:
 	push bp
 	mov bp,sp
+	push es
 	pusha
+
+	mov ax,ss
+	mov es,ax
 
 	mov si,0x4[bp]	; Source
 	mov di,0x6[bp]	; Destination
 	mov cx,0x8[bp]	; Size
 
 __copyout:		; Copy
-	mov al,[si]
-	mov [di],al
-	inc si
-	inc di
+	lodsb
+	stosb
 	loop __copyout
 
 	popa
+	pop es
 	pop bp
 	ret
 
@@ -346,6 +349,12 @@ __bdread:
 	ret
 
 .DATA
+
+; proc[0]'s per-process data area copy
+.GLOBAL u
+u:
+	.SPACE 0x0400	; 1K, USIZE * 2 * 32
+stack:	; Grows downwards from per-process data area
 
 ; Not used by PC
 .GLOBAL _cputype

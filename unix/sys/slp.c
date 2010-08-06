@@ -494,6 +494,7 @@ retry:
 	u.u_procp = rpp;
 	rip = up;
 	n = rip->p_size;
+	n += 1024; /* XXX: icode */
 	a1 = rip->p_addr;
 	rpp->p_size = n;
 	/*
@@ -523,7 +524,6 @@ retry:
 		 * There is core, so just copy.
 		 */
 		rpp->p_addr = a2;
-		n = 1024; /* XXX copy all of data segment & stack */
 		while(n--)
 			copyseg(a1++, a2++);
 	}
