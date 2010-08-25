@@ -53,8 +53,7 @@ _setseg:
 	mov ax,0x4[bp]
 	; Value is given in 64B,
 	; not 16B clicks
-	; XXXXXX verify!
-	shl ax,#3
+	shl ax,#2
 	mov curseg,ax
 	pop bp
 	ret
