@@ -1,3 +1,13 @@
+.DATA
+
+; proc[0]'s per-process data area copy
+.GLOBL _u
+_u:
+	.SPACE 0x0400	; 1K, USIZE * 2 * 32
+stack:	; Grows downwards from per-process data area
+regstage:
+	.SPACE 16	; 8 general purpose regs
+
 .TEXT
 
 .GLOBL _start
@@ -6,14 +16,17 @@ _start:
 	; Kernel initialization
 	call _main
 	; Jump into user mode
-	mov ax,ss
+	mov si,_u+0x50	; u.u_procp
+	mov ax,0x10[si]	; p.p_addr
+	shl ax,#2	; clicks to segment
+	add ax,#0x040	; skip over user area
 	mov es,ax
 	mov ds,ax
 	mov ss,ax
 	mov fs,ax
 	mov gs,ax
 	push ax
-	push #0x0400
+	push #0x0000
 	retf
 
 ; Not implemented
@@ -163,7 +176,7 @@ _clearseg:
 	ret
 
 ; Copy into a single single 64B click
-; from current data segment
+; from one segment to another
 .GLOBL _copyseg
 _copyseg:
 	push bp
@@ -201,8 +214,7 @@ __copy:			; Copy
 ; IP is saved in AX, which is the non-zero return value upon resume()
 .GLOBL _save
 _save:
-	cli
-	pop ax		; Return value
+	pop ax		; Return address
 	push bx		; Save BX
 	push di		; Save DI, we use it do index target
 	push bp		; Save BP, used to index argument
@@ -231,10 +243,32 @@ _save:
 _resume:
 	pop ax		; Throw away return address, we're not returning
 	pop bx		; Process address (clicks)
-	mov bp,sp
-	mov di,[bp]
-	shl bx,#2	; Convert to a segment
-	mov ss,bx	; Switch to a new stack
+
+	; Context might be in the uarea we're going to overwrite
+	; We need to restore it afterwards; save it
+	pop si		; Context
+	mov di,#regstage ; Destination U area
+	mov cx,#16	; 8 regs
+__stageregs:
+	lodsb
+	stosb
+	loop __stageregs
+
+	; Shadow process' U area to this address space
+	shl bx,#2	; Convert clicks to segment
+	mov ds,bx
+	xor si,si	; Source at zero
+	mov di,#_u	; Destination U area
+	mov cx,#1024	; Size
+__ucopy:		; Copy
+	lodsb
+	stosb
+	loop __ucopy
+	push es
+	pop ds
+
+	; Restore (most) general purpose registers
+	mov di,#regstage
 	mov ax,0x0[di]
 	mov cx,0x2[di]
 	mov dx,0x4[di]
@@ -243,6 +277,7 @@ _resume:
 	mov bp,0xa[di]
 	mov si,0xc[di]
 	mov di,0xe[di]
+
 	jmp ax
 
 ; Copy into current process' .data
@@ -253,7 +288,11 @@ _copyout:
 	push es
 	pusha
 
-	mov ax,ss
+	; Process' data
+	mov si,_u+0x50	; u.u_procp
+	mov ax,0x10[si]	; p.p_addr
+	shl ax,#2	; clicks to segment
+	add ax,#0x40	; skip through the U area
 	mov es,ax
 
 	mov si,0x4[bp]	; Source
@@ -349,12 +388,6 @@ __bdread:
 	ret
 
 .DATA
-
-; proc[0]'s per-process data area copy
-.GLOBAL u
-u:
-	.SPACE 0x0400	; 1K, USIZE * 2 * 32
-stack:	; Grows downwards from per-process data area
 
 ; Not used by PC
 .GLOBAL _cputype
