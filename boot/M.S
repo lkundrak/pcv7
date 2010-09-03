@@ -1,5 +1,5 @@
 ; Segment where kernel resides
-KERNEL=0x0060
+KERNEL=0x0100
 
 ; Copy a word to kernel memory space
 .GLOBAL _mtpi

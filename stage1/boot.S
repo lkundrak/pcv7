@@ -17,12 +17,12 @@
 ; 00a00 file data blocks
 ; 07c00 This boot sector code
 ; 0ffff Top of our stack
-; 20600 We'l relocate the second stage bootstrap here
+; 21000 We'l relocate the second stage bootstrap here
 ; 205ff Top of second stage stack
 ; a0000 End of usable RAM
 ;     - Video RAM and BIOS
 
-STAGE2=0x2060
+STAGE2=0x2100
 
 .GLOBAL _main
 _main:
