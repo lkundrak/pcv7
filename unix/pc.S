@@ -223,7 +223,6 @@ _save:
 	mov 0x0[di],ax	; AX, A non-zero return value upon resume()
 	mov 0x2[di],cx
 	mov 0x4[di],dx
-	mov 0x6[di],bx
 	add bp,#0x06	; Original SP (w/o return value)
 	mov 0x8[di],bp
 	pop bp		; Saved BP
@@ -231,8 +230,9 @@ _save:
 	mov 0xc[di],si
 	pop bx		; Saved DI
 	mov 0xe[di],bx
-	mov di,0xe[di]	; Restore DI
 	pop bx		; Restore BX
+	mov 0x6[di],bx
+	mov di,0xe[di]	; Restore DI
 	push ax		; Return address
 	xor ax,ax	; Return value in saving process
 	ret
