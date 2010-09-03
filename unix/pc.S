@@ -8,13 +8,25 @@ stack:	; Grows downwards from per-process data area
 regstage:
 	.SPACE 16	; 8 general purpose regs
 
+; Current process address (KDSA6)
+.GLOBL _cpaddr
+_cpaddr:
+	.SPACE 2
+
 .TEXT
 
 .GLOBL _start
 _start:
 	mov sp,#stack
+
+	mov ax,ds
+	sub ax,#0x40	; Kernel process 0's U area
+	shr ax,#2
+	mov _cpaddr,ax
+
 	; Kernel initialization
 	call _main
+
 	; Jump into user mode
 	mov si,_u+0x50	; u.u_procp
 	mov ax,0x10[si]	; p.p_addr
@@ -351,13 +363,6 @@ _usermem:
 	mov ax,cs
 	add ax,#0x1000
 	add ax,#0x3
-	shr ax,#2
-	ret
-
-; Beginning of current D space in clicks
-.GLOBAL _curseg
-_curseg:
-	mov ax,ds
 	shr ax,#2
 	ret
 

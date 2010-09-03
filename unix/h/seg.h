@@ -25,3 +25,5 @@ physadr	ka6;		/* 11/40 KISA6; 11/45 KDSA6 */
 #define	UBMAP	((physadr)0170200)
 
 #endif
+
+physadr	cpaddr;		/* 11/40 KISA6; 11/45 KDSA6 */
