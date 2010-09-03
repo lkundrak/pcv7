@@ -193,9 +193,24 @@ _clearseg:
 _copyseg:
 	push bp
 	mov bp,sp
-	pusha		; Save status (we need ax & cx)
+	pusha
 	push ds
 	push es
+
+	; It's possible that we're copying from the current U
+	; area, swap current one away just in case we need it
+	mov bx,_cpaddr
+	shl bx,#2	; clicks to segment
+	mov es,bx
+	xor di,di	; Destination at zero
+	mov si,#_u	; Source U area
+	mov cx,#1024	; Size
+__cuout:		; Copy
+	lodsb
+	stosb
+	loop __cuout
+	push ds
+	pop es
 
 	mov ax,0x4[bp]	; Source
 	shl ax,#2	; Convert to a segment
@@ -255,32 +270,9 @@ _save:
 _resume:
 	pop ax		; Throw away return address, we're not returning
 	pop bx		; Process address (clicks)
+	pop di		; Context
 
-	; Context might be in the uarea we're going to overwrite
-	; We need to restore it afterwards; save it
-	pop si		; Context
-	mov di,#regstage ; Destination U area
-	mov cx,#16	; 8 regs
-__stageregs:
-	lodsb
-	stosb
-	loop __stageregs
-
-	; Shadow process' U area to this address space
-	shl bx,#2	; Convert clicks to segment
-	mov ds,bx
-	xor si,si	; Source at zero
-	mov di,#_u	; Destination U area
-	mov cx,#1024	; Size
-__ucopy:		; Copy
-	lodsb
-	stosb
-	loop __ucopy
-	push es
-	pop ds
-
-	; Restore (most) general purpose registers
-	mov di,#regstage
+	mov _cpaddr,bx
 	mov ax,0x0[di]
 	mov cx,0x2[di]
 	mov dx,0x4[di]
@@ -291,6 +283,52 @@ __ucopy:		; Copy
 	mov di,0xe[di]
 
 	jmp ax
+
+; We potentially switch the stack here, which is the reason
+; this is implemented in assembly here.
+.GLOBL _sureg
+_sureg:
+	pop bp
+
+	; Currently loaded process
+	mov si,_u+0x50	; u.u_procp
+	mov bx,0x10[si]	; p.p_addr
+	shl bx,#2	; click into segment
+
+	; A process that should be current
+	mov dx,_cpaddr
+	shl dx,#2	; click into segment
+
+	; Not switching a process?
+	cmp bx,dx
+	je __nosw
+
+	; Swap out the U area
+	mov es,bx
+	xor di,di	; Destination at zero
+	mov si,#_u	; Source U area
+	mov cx,#1024	; Size
+__uout:			; Copy
+	lodsb
+	stosb
+	loop __uout
+	push ds
+	pop es
+
+	; Swap in the new U area
+	mov ds,dx
+	xor si,si	; Source at zero
+	mov di,#_u	; Destination U area
+	mov cx,#1024	; Size
+__uin:			; Copy
+	lodsb
+	stosb
+	loop __uin
+	push es
+	pop ds
+
+__nosw:
+	jmp bp
 
 ; Copy into current process' .data
 .GLOBL _copyout

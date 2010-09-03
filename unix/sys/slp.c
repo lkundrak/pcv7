@@ -494,7 +494,6 @@ retry:
 	u.u_procp = rpp;
 	rip = up;
 	n = rip->p_size;
-	n += 1024; /* XXX: icode */
 	a1 = rip->p_addr;
 	rpp->p_size = n;
 	/*
@@ -502,9 +501,7 @@ retry:
 	 * here's where it will resume.
 	 */
 	if (save(u.u_ssav)) {
-#ifdef PDP11
 		sureg();
-#endif
 		return(1);
 	}
 

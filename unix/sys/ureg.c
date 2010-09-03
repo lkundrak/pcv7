@@ -12,10 +12,10 @@
  * The software registers must have
  * been setup prior by estabur.
  */
+#ifdef PDP11
 sureg()
 {
 panic ("no sureg()");
-#ifdef PDP11
 	register *udp, *uap, *rdp;
 	int *rap, *limudp;
 	int taddr, daddr;
@@ -34,8 +34,8 @@ panic ("no sureg()");
 		*rap++ = *uap++ + (*udp&TX? taddr: (*udp&ABS? 0: daddr));
 		*rdp++ = *udp++;
 	}
-#endif
 }
+#endif
 
 /*
  * Set up software prototype segmentation
