@@ -17,12 +17,43 @@ _cpaddr:
 
 .GLOBL _start
 _start:
+	; Set up stack
 	mov sp,#stack
 
+	; Set up current process
 	mov ax,ds
 	sub ax,#0x40	; Kernel process 0's U area
 	shr ax,#2
 	mov _cpaddr,ax
+
+	; Set up interrupts
+	push si		; WTF? Otherwise main() would fail -- shat does compiler use this for?
+	push ds
+
+	push #0		; IVT starts at segment 0
+	pop ds
+
+	xor di,di	; CPU interrupts and IRQs start here
+	mov cx,#8	; 16 of them
+	mov si,#intr0	; Start with first dispatch table entry
+__instintr:
+	mov [di],si	; Offset
+	add di,#2	; Followed by...
+	mov [di],cs	; Segment
+	add di,#2	; Next IVT entry
+	add si,#intr1	; Next dispatch table entry...
+	sub si,#intr0	; ...all have the same length
+	loop __instintr
+
+	mov 0x3c4,#intrf1 ; A system call
+	mov 0x3c6,cs
+
+	push cs
+	pop ds		; We now write into CS
+	pop ax		; Saved DS
+	mov kds,ax	; Store it for trap handler
+	mov ds,ax	; and finally restore it back
+	pop si
 
 	; Kernel initialization
 	call _main
@@ -40,6 +71,59 @@ _start:
 	push ax
 	push #0x0000
 	retf
+
+; Kernel data segment. Upon trap, CPU restores just CS,
+; we need to restore the rest ourselves, thus this needs to
+; reside in .TEXT
+kds:
+	.SPACE 2
+
+; Pass control to C trap handling routine
+intrh:
+	push ds
+	push cs
+	pop ds
+	mov ds,kds
+	pop ds
+	add sp,#2	; Remove the trap number
+	iret
+
+; Interrupt dispatch table
+intr0:	push #0x0000
+	jmp intrh
+intr1:	push #0x0001
+	jmp intrh
+intr2:	push #0x0002
+	jmp intrh
+intr3:	push #0x0003
+	jmp intrh
+intr4:	push #0x0004
+	jmp intrh
+intr5:	push #0x0005
+	jmp intrh
+intr6:	push #0x0006
+	jmp intrh
+intr7:	push #0x0007
+	jmp intrh
+intr8:	push #0x0008
+	jmp intrh
+intr9:	push #0x0009
+	jmp intrh
+intra:	push #0x000a
+	jmp intrh
+intrb:	push #0x000b
+	jmp intrh
+intrc:	push #0x000c
+	jmp intrh
+intrd:	push #0x000d
+	jmp intrh
+intre:	push #0x000e
+	jmp intrh
+intrf:	push #0x000f
+	jmp intrh
+; A system call
+intrf1:	push #0x00f1
+	jmp intrh
 
 ; Not implemented
 

@@ -7,6 +7,6 @@ pt:
 	int #0x10
 	loop pt
 lp:
+	int #0xf1
 	hlt
 	jmp lp
-
