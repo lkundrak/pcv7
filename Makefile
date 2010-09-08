@@ -38,6 +38,9 @@ iboot2: fs $(STAGE2) $(STAGE3)
 run: iboot1 iboot2
 	$(QEMU) -net none -fda image $(QEMUFLAGS)
 
+run-bochs: iboot1 iboot2
+	bochs -qf /dev/null 'boot:a' 'floppya: 1_44=image, status=inserted'
+
 clean:
 	-for S in $(SUBDIRS); do $(MAKE) -C $$S $@; done
 	-rm -f image
