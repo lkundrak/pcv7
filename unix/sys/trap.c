@@ -62,6 +62,8 @@ dev_t dev;
 	default:
 #ifdef PDP11
 		printf("ka6 = %o\n", ka6->r[0]);
+#else
+		printf("ka6 = %o\n", cpaddr);
 #endif
 		printf("aps = %o\n", &ps);
 		printf("pc = %o ps = %o\n", pc, ps);
