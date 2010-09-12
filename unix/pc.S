@@ -27,7 +27,7 @@ _start:
 	mov _cpaddr,ax
 
 	; Set up interrupts
-	push si		; WTF? Otherwise main() would fail -- shat does compiler use this for?
+	push si		; WTF? Otherwise main() would fail -- what does compiler use this for?
 	push ds
 
 	push #0		; IVT starts at segment 0
