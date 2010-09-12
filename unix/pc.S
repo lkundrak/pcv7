@@ -13,6 +13,10 @@ regstage:
 _cpaddr:
 	.SPACE 2
 
+; Kernel stack pointer
+savesp:
+	.SPACE 2
+
 .TEXT
 
 .GLOBL _start
@@ -57,6 +61,7 @@ __instintr:
 
 	; Kernel initialization
 	call _main
+	mov savesp,sp
 
 	; Jump into user mode
 	mov si,_u+0x50	; u.u_procp
@@ -77,16 +82,6 @@ __instintr:
 ; reside in .TEXT
 kds:
 	.SPACE 2
-
-; Pass control to C trap handling routine
-intrh:
-	push ds
-	push cs
-	pop ds
-	mov ds,kds
-	pop ds
-	add sp,#2	; Remove the trap number
-	iret
 
 ; Interrupt dispatch table
 intr0:	push #0
@@ -124,6 +119,78 @@ intrf:	push #0
 ; A system call
 intrf1:	push #6
 	jmp intrh
+
+; Pass control to C trap handling routine
+intrh:
+	pusha
+	push ds		; Save context
+	push es
+	push fs
+	push gs
+
+	; Arrange for stack switch
+	mov cx,ss	; Old stack
+	mov si,sp
+
+	push cs		; Read data from .text
+	pop ds
+
+	mov bx,kds	; Switch to new .data so that we can read savesp
+	mov ds,bx
+
+	mov ss,bx
+	mov sp,savesp	; New stack
+	push cx		; Save for recovery of the old stack
+	push si
+
+	mov ds,cx	; Prepare for copying stuff from old stack
+
+	; Construct C handler's arguments stack
+	xor ax,ax	; (ps) argument telling whether we came from user mode
+	mov bx,ss
+	cmp bx,cx
+	je __kmode
+	mov ax,#0170000	; UMODE
+__kmode:
+	push ax
+	add si,#26 	; (pc) Return address
+	lodsw
+	push ax
+	sub si,#6 	; (r0) AX register
+	lodsw
+	push ax
+	push #0 	; (nps) Not used
+	sub si,#8 	; (r1) BX register
+	lodsw
+	push ax
+	push #0 	; (sp) Not used, we can not grow stack
+	add si,#6 	; (dev) Trap number
+	lodsw
+	push ax
+
+	; Set up the rest of segment registers
+	mov ds,bx
+	mov es,bx
+	mov fs,bx
+	mov gs,bx
+
+	call _trap	; Dispatch to C coutine
+
+	add sp,#14	; Chuck the arguments
+
+	pop bx		; Resume old stack
+	pop ax
+	mov ss,ax
+	mov sp,bx
+
+	pop gs
+	pop fs
+	pop es
+	pop ds
+	popa		; Resume context
+
+	add sp,#2	; Chuck trap number
+	iret
 
 ; Not implemented
 
