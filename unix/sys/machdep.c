@@ -60,6 +60,14 @@ startup()
 		UBMAP->r[i+1] = 0;
 	}
 	printf("mem = %D\n", ctob((long)maxmem));
+	printf("mem = %D\n", ctob((long)maxmem));
+memsize ();
+#else
+	maxmem = memsize ();
+	printf("mem = %D\n", ctob((long)maxmem));
+#endif
+#if 0
+	printf("mem = %D\n", 0x1234, 0x5678, 0x9abc, 0xdef0);
 	if(MAXMEM < maxmem)
 		maxmem = MAXMEM;
 	mfree(swapmap, nswap, 1);

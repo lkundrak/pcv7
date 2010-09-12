@@ -80,7 +80,9 @@ panic(s)
 char *s;
 {
 	panicstr = s;
+#if 0
 	update();
+#endif
 	printf("panic: %s\n", s);
 	for(;;)
 		idle();
