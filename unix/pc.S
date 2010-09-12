@@ -89,40 +89,40 @@ intrh:
 	iret
 
 ; Interrupt dispatch table
-intr0:	push #0x0000
+intr0:	push #0
 	jmp intrh
-intr1:	push #0x0001
+intr1:	push #0
 	jmp intrh
-intr2:	push #0x0002
+intr2:	push #0
 	jmp intrh
-intr3:	push #0x0003
+intr3:	push #0
 	jmp intrh
-intr4:	push #0x0004
+intr4:	push #0
 	jmp intrh
-intr5:	push #0x0005
+intr5:	push #0
 	jmp intrh
-intr6:	push #0x0006
+intr6:	push #0
 	jmp intrh
-intr7:	push #0x0007
+intr7:	push #0
 	jmp intrh
-intr8:	push #0x0008
+intr8:	push #0
 	jmp intrh
-intr9:	push #0x0009
+intr9:	push #0
 	jmp intrh
-intra:	push #0x000a
+intra:	push #0
 	jmp intrh
-intrb:	push #0x000b
+intrb:	push #0
 	jmp intrh
-intrc:	push #0x000c
+intrc:	push #0
 	jmp intrh
-intrd:	push #0x000d
+intrd:	push #0
 	jmp intrh
-intre:	push #0x000e
+intre:	push #0
 	jmp intrh
-intrf:	push #0x000f
+intrf:	push #0
 	jmp intrh
 ; A system call
-intrf1:	push #0x00f1
+intrf1:	push #6
 	jmp intrh
 
 ; Not implemented
