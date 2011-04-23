@@ -122,73 +122,80 @@ intrf1:	push #6
 
 ; Pass control to C trap handling routine
 intrh:
-	pusha
-	push ds		; Save context
-	push es
-	push fs
-	push gs
+	pusha		; Save context. Instruction 80186 only!!!
 
 	; Arrange for stack switch
-	mov cx,ss	; Old stack
+	mov dx,ss	; Old stack
 	mov si,sp
 
 	push cs		; Read data from .text
 	pop ds
 
-	mov bx,kds	; Switch to new .data so that we can read savesp
-	mov ds,bx
-
+	mov bx,kds	; Switch to kernel .stack & .data (so that we can read savesp)
 	mov ss,bx
+	mov ds,bx
 	mov sp,savesp	; New stack
-	push cx		; Save for recovery of the old stack
-	push si
+	push dx		; Save for recovery of the old stack (userspace SS)
+	push si		; userspace SP
 
-	mov ds,cx	; Prepare for copying stuff from old stack
+	mov ds,dx	; Prepare for copying stuff from old stack
 
 	; Construct C handler's arguments stack
+
+	push #0 	; (sp) Not used, we can not grow stack
+
 	xor ax,ax	; (ps) argument telling whether we came from user mode
 	mov bx,ss
-	cmp bx,cx
+	cmp bx,dx
 	je __kmode
 	mov ax,#0170000	; UMODE
 __kmode:
 	push ax
-	add si,#26 	; (pc) Return address
-	lodsw
-	push ax
-	sub si,#6 	; (r0) AX register
-	lodsw
-	push ax
-	push #0 	; (nps) Not used
-	sub si,#8 	; (r1) BX register
-	lodsw
-	push ax
-	push #0 	; (sp) Not used, we can not grow stack
-	add si,#6 	; (dev) Trap number
-	lodsw
-	push ax
 
-	; Set up the rest of segment registers
+	mov cx,#10	; 8 registers (r0-r7),
+			; trap number (dev) and a return value (pc)
+savess:			; Copy userspace stack onto ours
+	lodsw
+	push ax
+	loop savess
+
+	; Set up the rest of segment registers for kernel mode
 	mov ds,bx
 	mov es,bx
 	mov fs,bx
 	mov gs,bx
 
-	call _trap	; Dispatch to C coutine
+	; Dispatch to C coutine
+	call _trap
 
-	add sp,#14	; Chuck the arguments
+	mov bp,sp
+	mov di,24[bp]	; Recover old stack (userspace SS)
+	mov dx,26[bp]	; userspace SP
 
-	pop bx		; Resume old stack
+	mov es,dx	; Prepare for copying stuff back to user stack
+			; trap() could have modified the registers
+
+	std		; ...copy backwards
+	add di,#18	; Stand from the end and...
+	mov cx,#10	; 8 registers (r0-r7),
+			; trap number (dev) and a return value (pc)
+restoress:		; Copy our space into userspace one
 	pop ax
-	mov ss,ax
-	mov sp,bx
+	stosw
+	loop restoress
+	cld
+	add di,#2
 
-	pop gs
-	pop fs
-	pop es
-	pop ds
+	mov ax,di	; Resume user stack pointer
+	mov sp,ax
+
+	mov bx,es	; Resume user segments
+	mov ss,bx
+	mov ds,bx
+	mov fs,bx
+	mov gs,bx
+
 	popa		; Resume context
-
 	add sp,#2	; Chuck trap number
 	iret
 
