@@ -5,7 +5,7 @@ LD = ld86
 LDFLAGS = -0 -s -i -7 #-M -t -m
 LIBBCC = /usr/lib/bcc/libbcc.a
 AS = as86
-ASFLAGS = -0 -g
+ASFLAGS = -0 -W -g
 
 FILES = pc.o
 FILES += sys/main.o
