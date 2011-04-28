@@ -53,7 +53,8 @@ _setseg:
 	mov ax,0x4[bp]
 	; Value is given in 64B,
 	; not 16B clicks
-	shl ax,#2
+	shl ax,#1
+	shl ax,#1
 	mov curseg,ax
 	pop bp
 	ret
@@ -69,8 +70,6 @@ _jumpunix:
 	; Set the segmentation registers appropriately
         mov es,ax
         mov ds,ax
-        mov fs,ax
-        mov gs,ax
         mov ss,ax
 	mov sp,#0xffff
 	push bx

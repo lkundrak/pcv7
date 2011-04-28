@@ -27,7 +27,8 @@ _start:
 	; Set up current process
 	mov ax,ds
 	sub ax,#0x40	; Kernel process 0's U area
-	shr ax,#2
+	shr ax,#1
+	shr ax,#1
 	mov _cpaddr,ax
 
 	; Set up interrupts
@@ -66,13 +67,12 @@ __instintr:
 	; Jump into user mode
 	mov si,_u+0x50	; u.u_procp
 	mov ax,0x10[si]	; p.p_addr
-	shl ax,#2	; clicks to segment
+	shl ax,#1	; clicks to segment
+	shl ax,#1
 	add ax,#0x040	; skip over user area
 	mov es,ax
 	mov ds,ax
 	mov ss,ax
-	mov fs,ax
-	mov gs,ax
 	push ax
 	push #0x0000
 	retf
@@ -122,7 +122,14 @@ intrf1:	push #6
 
 ; Pass control to C trap handling routine
 intrh:
-	pusha		; Save context. Instruction 80186 only!!!
+	push ax
+	push cx
+	push dx
+	push bx
+	push sp		; This is different from pusha, which would
+	push bp		; push sp before "pusha" instruction. We do not care
+	push si
+	push di
 
 	; Arrange for stack switch
 	mov dx,ss	; Old stack
@@ -162,8 +169,6 @@ savess:			; Copy userspace stack onto ours
 	; Set up the rest of segment registers for kernel mode
 	mov ds,bx
 	mov es,bx
-	mov fs,bx
-	mov gs,bx
 
 	; Dispatch to C coutine
 	call _trap
@@ -192,10 +197,15 @@ restoress:		; Copy our space into userspace one
 	mov bx,es	; Resume user segments
 	mov ss,bx
 	mov ds,bx
-	mov fs,bx
-	mov gs,bx
 
-	popa		; Resume context
+	pop di
+	pop si
+	pop bp
+	pop sp
+	pop bx
+	pop dx
+	pop cx
+	pop ax
 	add sp,#2	; Chuck trap number
 	iret
 
@@ -332,7 +342,8 @@ _clearseg:
 	push bp
 	mov bp,sp
 	mov ax,0x4[bp]	; Destination click
-	shl ax,#2	; Convert to a segment
+	shl ax,#1	; Convert to a segment
+	shl ax,#1
 	push es
 	push ax
 	pop es
@@ -351,14 +362,19 @@ _clearseg:
 _copyseg:
 	push bp
 	mov bp,sp
-	pusha
+	push ax	; Do we need to save all these?
+	push cx
+	push bx
+	push di
+	push si
 	push ds
 	push es
 
 	; It's possible that we're copying from the current U
 	; area, swap current one away just in case we need it
 	mov bx,_cpaddr
-	shl bx,#2	; clicks to segment
+	shl bx,#1	; clicks to segment
+	shl bx,#1
 	mov es,bx
 	xor di,di	; Destination at zero
 	mov si,#_u	; Source U area
@@ -371,14 +387,18 @@ __cuout:		; Copy
 	pop es
 
 	mov ax,0x4[bp]	; Source
-	shl ax,#2	; Convert to a segment
-	push ax
-	pop ds
+	shl ax,#1	; Convert to a segment
+	shl ax,#1
+	;push ax
+	;pop ds
+	mov ds,ax
 
 	mov ax,0x6[bp]	; Destination
-	shl ax,#2	; Convert to a segment
-	push ax
-	pop es
+	shl ax,#1	; Convert to a segment
+	shl ax,#1
+	;push ax
+	;pop es
+	mov es,ax
 
 	xor di,di	; Start at zero
 	xor si,si
@@ -390,7 +410,11 @@ __copy:			; Copy
 
 	pop es		; Resume status
 	pop ds
-	popa
+	pop si
+	pop di
+	pop bx
+	pop cx
+	pop ax
 	pop bp
 	ret
 
@@ -451,11 +475,13 @@ _sureg:
 	; Currently loaded process
 	mov si,_u+0x50	; u.u_procp
 	mov bx,0x10[si]	; p.p_addr
-	shl bx,#2	; click into segment
+	shl bx,#1	; click into segment
+	shl bx,#1
 
 	; A process that should be current
 	mov dx,_cpaddr
-	shl dx,#2	; click into segment
+	shl dx,#1	; click into segment
+	shl dx,#1
 
 	; Not switching a process?
 	cmp bx,dx
@@ -494,12 +520,15 @@ _copyout:
 	push bp
 	mov bp,sp
 	push es
-	pusha
+	push ax
+	push cx
+	push si
 
 	; Process' data
 	mov si,_u+0x50	; u.u_procp
 	mov ax,0x10[si]	; p.p_addr
-	shl ax,#2	; clicks to segment
+	shl ax,#1	; clicks to segment
+	shl ax,#1
 	add ax,#0x40	; skip through the U area
 	mov es,ax
 
@@ -512,7 +541,9 @@ __copyout:		; Copy
 	stosb
 	loop __copyout
 
-	popa
+	pop si
+	pop cx
+	pop ax
 	pop es
 	pop bp
 	ret
@@ -550,7 +581,10 @@ _spl0:
 _memsize:
 	int #0x12
 	; Kbytes to 64B clicks
-	shl ax,#4
+	shl ax,#1
+	shl ax,#1
+	shl ax,#1
+	shl ax,#1
 	ret
 
 ; First 64B click not occupied by kernel
@@ -559,7 +593,8 @@ _usermem:
 	mov ax,cs
 	add ax,#0x1000
 	add ax,#0x3
-	shr ax,#2
+	shr ax,#1
+	shr ax,#1
 	ret
 
 ; Disk input
