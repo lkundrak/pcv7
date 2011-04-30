@@ -73,7 +73,8 @@ _jumpunix:
         mov ss,ax
 	mov sp,#0xffff
 	push bx
-	push #0x0	; Entry point hardcoded for now
+	xor ax,ax
+	push ax	; Entry point hardcoded for now
 	retf
 
 .GLOBAL curseg

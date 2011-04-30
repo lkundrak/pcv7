@@ -8,7 +8,8 @@ _putchar:
 	; CRLF conversion
 	cmp 4[bp],#0xa
 	jne __putchar
-	push #0xd
+	mov ax,#0xd
+	push ax
 	call _putchar
 	add sp,#2
 __putchar:

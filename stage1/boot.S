@@ -112,8 +112,6 @@ copyboot:
 	mov ds,ax
 	mov ax,#STAGE2
 	mov ds,ax
-	mov fs,ax
-	mov gs,ax
 	mov ss,ax
 	push ax
 	push bx
@@ -139,12 +137,16 @@ readfile:
 ; BX => file size
 ; 0xa00 => read file
 	call iread	; Load the inode and indirect block
-	mov cx,bx	; File length in bytes
-	cmp cx,#0
+	mov dx,bx	; File length in bytes
+	cmp dx,#0
 	je empty	; Zero-length file
-	dec cx
-	shr cx,#9	; Translate bytes to blocks
-	inc cx		; This many blocks
+	dec dx
+	mov cx,#9	; Translate bytes to blocks
+b2b:
+	shr dx,#1
+	loop b2b
+	inc dx		; This many blocks
+	mov cx,dx
 
 	xor dx,dx	; Start from block zero
 blk:
@@ -160,9 +162,14 @@ empty:
 ; DX <= block number
 ; AX => preserved
 ; CX => preserved
+; DX => preserved
+; BX => preserved
 ; 0x0a00 + DX * 512 => read block
 rmblk:
-	pusha
+	push ax
+	push cx
+	push dx
+	push bx
 
 	; Inode block map
 	mov si,#0x060c
@@ -190,11 +197,11 @@ sizeok:
 	; Single indirection
 	mov si,#0x0800	; Block offset is relative to indirect block now
 	sub dx,#10
-	; four-byte entries in indirect block!?
+	; four-byte entries in indirect block
 	add si,dx
 
 direct:	
-	; A three-byte address (?)
+	; A three-byte address
 	add si,dx
 	add si,dx
 	add si,dx
@@ -202,12 +209,19 @@ direct:
 
 	; Destination address
 	pop di
-	shl di,#0x09
+	push cx
+	mov cx,#9
+shift2:	shl di,#1
+	loop shift2
+	pop cx
 	add di,#0x0a00
 
 	; Do the read
 	call lbaread
-	popa
+	pop bx
+	pop dx
+	pop cx
+	pop ax
 	ret
 
 ; Read file metadata -- the inode
@@ -223,7 +237,9 @@ iread:
 	add ax,#0x0f
 	push ax
 	; Block number
-	shr ax,3
+	shr ax,#1
+	shr ax,#1
+	shr ax,#1
 
 	mov di,#0x0600
 	call lbaread
@@ -231,7 +247,9 @@ iread:
 	; Inode offset from start of block
 	pop ax
 	and ax,#0x7
-	shl ax,#6
+	mov cx,#6
+shift1:	shl ax,#1
+	loop shift1
 
 	; File length
 	mov si,#0x0608
@@ -243,12 +261,16 @@ iread:
 	jle short
 
 	; Single indirection
-	pusha
+	push ax
+	push bx
+	push di
 	add di,ax
 	mov ax,42[di]	; 10th 3-byte address in inode
 	mov di,#0x0800	; Indirect block is loaded here
 	call lbaread
-	popa
+	pop di
+	pop bx
+	pop ax
 
 short:
 	ret

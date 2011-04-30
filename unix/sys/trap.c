@@ -31,7 +31,7 @@ char	regloc[9] =
  * get copied back on return.
  * dev is the kind of trap that occurred.
  */
-trap(pc, dev, r0, r1, r2, r3, r4, r5, r6, r7, ps, sp)
+trap(pc, r0, r1, r2, r3, r4, r5, r6, r7, dev, ps, sp)
 int *pc;
 dev_t dev;
 {

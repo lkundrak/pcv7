@@ -35,7 +35,8 @@ _start:
 	push si		; WTF? Otherwise main() would fail -- what does compiler use this for?
 	push ds
 
-	push #0		; IVT starts at segment 0
+	xor ax,ax
+	push ax		; IVT starts at segment 0
 	pop ds
 
 	xor di,di	; CPU interrupts and IRQs start here
@@ -74,7 +75,8 @@ __instintr:
 	mov ds,ax
 	mov ss,ax
 	push ax
-	push #0x0000
+	xor ax,ax
+	push ax
 	retf
 
 ; Kernel data segment. Upon trap, CPU restores just CS,
@@ -84,45 +86,61 @@ kds:
 	.SPACE 2
 
 ; Interrupt dispatch table
-intr0:	push #0
+intr0:	push ax
+	mov ax,#0
 	jmp intrh
-intr1:	push #0
+intr1:	push ax
+	mov ax,#0
 	jmp intrh
-intr2:	push #0
+intr2:	push ax
+	mov ax,#0
 	jmp intrh
-intr3:	push #0
+intr3:	push ax
+	mov ax,#0
 	jmp intrh
-intr4:	push #0
+intr4:	push ax
+	mov ax,#0
 	jmp intrh
-intr5:	push #0
+intr5:	push ax
+	mov ax,#0
 	jmp intrh
-intr6:	push #0
+intr6:	push ax
+	mov ax,#0
 	jmp intrh
-intr7:	push #0
+intr7:	push ax
+	mov ax,#0
 	jmp intrh
-intr8:	push #0
+intr8:	push ax
+	mov ax,#0
 	jmp intrh
-intr9:	push #0
+intr9:	push ax
+	mov ax,#0
 	jmp intrh
-intra:	push #0
+intra:	push ax
+	mov ax,#0
 	jmp intrh
-intrb:	push #0
+intrb:	push ax
+	mov ax,#0
 	jmp intrh
-intrc:	push #0
+intrc:	push ax
+	mov ax,#0
 	jmp intrh
-intrd:	push #0
+intrd:	push ax
+	mov ax,#0
 	jmp intrh
-intre:	push #0
+intre:	push ax
+	mov ax,#0
 	jmp intrh
-intrf:	push #0
+intrf:	push ax
+	mov ax,#0
 	jmp intrh
 ; A system call
-intrf1:	push #6
+intrf1:	push ax
+	mov ax,#6
 	jmp intrh
 
 ; Pass control to C trap handling routine
 intrh:
-	push ax
 	push cx
 	push dx
 	push bx
@@ -130,6 +148,7 @@ intrh:
 	push bp		; push sp before "pusha" instruction. We do not care
 	push si
 	push di
+	push ax
 
 	; Arrange for stack switch
 	mov dx,ss	; Old stack
@@ -149,7 +168,7 @@ intrh:
 
 	; Construct C handler's arguments stack
 
-	push #0 	; (sp) Not used, we can not grow stack
+	sub sp,#2	; (sp) Not used, we can not grow stack
 
 	xor ax,ax	; (ps) argument telling whether we came from user mode
 	mov bx,ss
@@ -198,6 +217,7 @@ restoress:		; Copy our space into userspace one
 	mov ss,bx
 	mov ds,bx
 
+	add sp,#2	; Chuck trap number
 	pop di
 	pop si
 	pop bp
@@ -206,7 +226,6 @@ restoress:		; Copy our space into userspace one
 	pop dx
 	pop cx
 	pop ax
-	add sp,#2	; Chuck trap number
 	iret
 
 ; Not implemented
@@ -302,11 +321,14 @@ _stst:
 	jmp ni
 
 ni:
-	push #10
-	push #0
+	mov bx,#10
+	push bx
+	xor bx,bx
+	push bx
 	push ax
 	call _printn
-	push #eimpl
+	mov ax,#eimpl
+	push ax
 	call _panic
 	ret
 
@@ -318,7 +340,8 @@ _putchar:
 	; CRLF conversion
 	cmp 4[bp],#0xa
 	jne __putchar
-	push #0xd
+	mov ax,#0xd
+	push ax
 	call _putchar
 	add sp,#2
 __putchar:
