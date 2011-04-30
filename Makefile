@@ -7,7 +7,7 @@ QEMUFLAGS = -monitor stdio
 #QEMUFLAGS = -curses -monitor /dev/tty3
 SUBDIRS = mkfs v7cat stage1 boot stage2b stage3 unix
 
-all: iboot2
+all: iboot1 iboot2
 
 .PHONY: $(SUBDIRS)
 $(SUBDIRS):
