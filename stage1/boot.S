@@ -28,17 +28,18 @@ STAGE2=0x2100
 _main:
 	mov sp,#0xffff
 
-reset:
-	mov ah,#0x0
-	mov dl,#0x00	; Drive A:
-	int #0x13
-	jc reset
-
 ; Detect floppy type,
 ; Make fdtype pointer into 3-byte entry in fdtable array
 
 	mov si,#fdtable
 fddetect:
+	; Reset the drive first
+	mov ah,#0x0
+	mov dl,#0x00	; Drive A:
+	int #0x13
+	jc fddetect	; Restart detection upon error
+
+	; Attempt to read the last sector
 	mov ah,#0x02	; Read sectors
 	mov al,#0x01	; One sector
 	mov dl,#0x00	; Drive A:

@@ -642,6 +642,11 @@ _bddread:
 	pop bp
 	ret
 __bdread:
+	; Reset error status first
+	xor ax,ax
+	xor dx,dx
+	int #0x13
+	; Return non-zero
 	mov ax,#1
 	pop bp
 	ret
