@@ -28,6 +28,15 @@ STAGE2=0x2100
 _main:
 	mov sp,#0xffff
 
+	; Although IBM PC seems to set this up correctly,
+	; most compatibles only set up CS
+	push cs
+	pop es
+	push cs
+	pop ds
+	push cs
+	pop ss
+
 ; Detect floppy type,
 ; Make fdtype pointer into 3-byte entry in fdtable array
 
