@@ -374,9 +374,17 @@ char c, *s;
 {
 	int i;
 
-	for(i=0; s[i]; i++)
+	for(i=0; s[i]; i++) {
+		int m;
+		switch (i) {
+			case 0: m = m0; break;
+			case 1: m = m1; break;
+			case 2: m = m2; break;
+			case 3: m = m3; break;
+		}
 		if(c == s[i])
-			return((&m0)[i]);
+			return m;
+	}
 	printf("%c/%s: bad mode\n", c, string);
 	error = 1;
 	return(0);
