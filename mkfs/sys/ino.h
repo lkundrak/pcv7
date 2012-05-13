@@ -8,7 +8,7 @@ struct dinode
 	short	di_nlink;    	/* number of links to file */
 	short	di_uid;      	/* owner's user id */
 	short	di_gid;      	/* owner's group id */
-	off_t	di_size;     	/* number of bytes in file */
+	off32_t	di_size;     	/* number of bytes in file */
 	char  	di_addr[40];	/* disk block addresses */
 	time_t	di_atime;   	/* time last accessed */
 	time_t	di_mtime;   	/* time last modified */

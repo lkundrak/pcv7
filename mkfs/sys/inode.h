@@ -33,7 +33,7 @@ struct	inode
 	short	i_nlink;	/* directory entries */
 	short	i_uid;		/* owner */
 	short	i_gid;		/* group of owner */
-	off_t	i_size;		/* size of file */
+	off32_t	i_size;		/* size of file */
 	union {
 		struct {
 			daddr_t i_addr[NADDR];	/* if normal file/directory */
