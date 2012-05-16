@@ -12,6 +12,11 @@ int	n;
 	a = cp;
 	b = (char *)lp;
 	for(i=0;i<n;i++) {
+#if __8086__
+		*a++ = *b++;
+		*a++ = *b++;
+		*a++ = *b++;
+#else
 #ifdef interdata
 		b++;
 		*a++ = *b++;
@@ -22,6 +27,7 @@ int	n;
 		b++;
 		*a++ = *b++;
 		*a++ = *b++;
+#endif
 #endif
 	}
 }
@@ -37,6 +43,12 @@ int	n;
 	a = (char *)lp;
 	b = cp;
 	for(i=0;i<n;i++) {
+#if __8086__
+		*a++ = *b++;
+		*a++ = *b++;
+		*a++ = *b++;
+		*a++ = 0;
+#else
 #ifdef interdata
 		*a++ = 0;
 		*a++ = *b++;
@@ -47,6 +59,7 @@ int	n;
 		*a++ = 0;
 		*a++ = *b++;
 		*a++ = *b++;
+#endif
 #endif
 	}
 }
