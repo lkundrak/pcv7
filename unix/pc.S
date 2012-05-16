@@ -374,7 +374,7 @@ _clearseg:
 	xor al,al	; Zero out
 	mov cx,#64	; 64 bytes
 	rep
-		stosb
+		stosw
 	pop es
 	pop bp
 	ret
