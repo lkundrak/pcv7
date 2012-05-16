@@ -42,10 +42,10 @@ register struct iob *io;
 	}
 
 	/* Convert linear address to a 3D one */
-	chs.cyl = io->i_bn/(type->head*type->sec);
-	chs.sec = io->i_bn%(type->head*type->sec);
-	chs.head = chs.sec/type->sec;
-	chs.sec = chs.sec%type->sec+1;
+	chs.cyl = (int)io->i_bn/(type->head*type->sec);
+	chs.sec = (int)io->i_bn%(type->head*type->sec);
+	chs.head = (int)chs.sec/type->sec;
+	chs.sec = (int)chs.sec%type->sec+1;
 
 	if (bdread (io->i_unit, chs.cyl, chs.sec, chs.head, io->i_ma)) {
 		_stop ("Read error.");
